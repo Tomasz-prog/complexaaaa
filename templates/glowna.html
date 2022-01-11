@@ -1,0 +1,27 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}
+Index
+{% block styles %}
+
+<link href="{% static 'management/main.css' %}" rel="stylesheet">
+
+
+{% endblock %}
+
+
+{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-light bg-light">
+  <form class="container-fluid justify-content-start">
+    <a href="{% url 'management:start' %}"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;Management&nbsp</button></a>
+    <a href="{% url 'pressure:main' %}"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;&nbsp;Pressure&nbsp;&nbsp;&nbsp</button></a>
+    <a href="{% url 'culture:main' %}"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;Culture Club&nbsp;&nbsp</button></a>
+    <a href="#"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;Bills&nbsp;&nbsp</button></a>
+
+  </form>
+</nav>
+
+{% endblock %}

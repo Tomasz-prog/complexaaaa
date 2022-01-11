@@ -1,0 +1,52 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}
+add task
+{% endblock %}
+{% block styles %}
+<link href="{% static 'management/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="topnav">
+  {% if side == "add" %}
+    <a href="{% url 'management:start' %}">lista projektów</a>
+    <a href="{% url 'management:zadania' numer_projektu %}">Zadania</a>
+    <a class="active" href="#contact">dodawanie</a>
+  {% else %}
+    <a href="{% url 'management:start' %}">lista projektów</a>
+    <a href="{% url 'management:zadania' numer_projektu %}">Zadania</a>
+    <a class="active" href="#contact">edycja</a>
+  {% endif %}
+<div>
+    {% if user.is_authenticated %}
+    <h1 class="display-4"> Witaj {{ user.username }}</h1>
+{#    <a href="#" class="btn btn-success">Logout <i class="fas fa-sign-out-alt"></i></a>#}
+{% else %}
+        <br><div>Nie jesteś zalogowany </div><br>
+{% endif %}
+</div>
+</div>
+
+{% if side == "add" %}
+  <div>Dodawanie zadania </div>
+{% else %}
+  <div>Edytowanie zadania</div>
+{% endif %}
+<form class="formularz" method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+<!--  {{ form }}-->
+  {{ form.title.label }}<br>{{ form.title}}<br><br>
+  {{ form.task.label }}<br>{{ form.task}}<br><br>
+  {{ form.branch.label}}<br>{{ form.branch}}<br><br>
+  {{ form.weight.label}}<br>{{ form.weight}}<br><br>
+  {{ form.level.label}}<br>{{ form.level}}<br><br>
+  {{ form.status.label}}<br>{{ form.status}}<br><br>
+  {{ form.timeneed.label}}<br>{{ form.timeneed }}<br><br>
+  {{ form.timedone.label}}<br>{{ form.timedone}}<br><br>
+  {{ form.projekt_id.label}}<br>{{ form.projekt_id}}<br><br>
+
+  <input type="submit" value="Wyślij">
+</form>
+{% endblock %}}

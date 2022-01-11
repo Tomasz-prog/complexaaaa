@@ -1,0 +1,140 @@
+{% extends 'base.html'%}
+{% load static %}
+{% block title %}
+Management
+{% endblock %}
+{% block styles %}
+<link href="{% static 'management/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="topnav">
+  <a  href="{% url 'management:start' %}">lista projektów</a>
+
+
+  {% if side == "delete" %}
+    <a   href="{% url 'management:zadania' nr_projektu %}">Zadania</a>
+    <a href="{% url 'management:add_task' %}">dodaj zadanie</a>
+    <a class="active" href="{% url 'management:delete_task' nr_projektu %}">usun zadanie</a>
+    <a href="{% url 'management:done_task' nr_projektu %}">done tasks</a>
+  {% elif side == "show" %}
+    <a  class="active" href="{% url 'management:zadania' nr_projektu %}">Zadania</a>
+    <a href="{% url 'management:add_task' %}">dodaj zadanie</a>
+    <a href="{% url 'management:delete_task' nr_projektu %}">usun zadanie</a>
+    <a href="{% url 'management:done_task' nr_projektu %}">done tasks</a>
+  {% else %}
+    <a href="{% url 'management:zadania' nr_projektu %}">Zadania</a>
+    <a href="{% url 'management:add_task' %}">dodaj zadanie</a>
+    <a href="{% url 'management:delete_task' nr_projektu %}">usun zadanie</a>
+    <a class="active"  href="{% url 'management:done_task' nr_projektu %}">done tasks</a>
+  {% endif %}
+</div>
+<form action="" method="post">
+    {% csrf_token %}
+
+    <div class="form_check">
+        <p>
+        <input type="checkbox" value="Minor" id="minor" name="weight">
+        <label for="minor">Minor</label>
+
+        <input type="checkbox" value="Major" id="major" name="weight">
+        <label for="major">Major</label>
+
+        <input type="checkbox" value="Critical" id="critical" name="weight">
+        <label for="critical">Critical</label>
+    </p>
+    </div>
+    <div class="form_check">
+        <p>
+        <input type="checkbox" value="Easy" id="easy" name="level">
+        <label for="easy">Easy</label>
+
+        <input type="checkbox" value="Medium" id="medium" name="level">
+        <label for="medium">Medium</label>
+
+        <input type="checkbox" value="Hard" id="hard" name="level">
+        <label for="hard">Hard</label>
+        </p>
+</div>
+
+
+    <button type="submit">submit</button>
+
+</form>
+<div>
+    {% if user.is_authenticated %}
+    <h1 class="display-4"> Zalogowany jako {{ user.username }}</h1>
+{#    <a href="#" class="btn btn-success">Logout <i class="fas fa-sign-out-alt"></i></a>#}
+{% else %}
+        <br><div>Nie jesteś zalogowany </div><br>
+{% endif %}
+</div>
+<div>
+  {% if side == "delete" %}
+    Usuwanie zadania <br> Wybierz zadanie do usuniecia
+  {% elif side == "show" %}
+    Edytowanie zadania <br> Wybierz zadanie do edycji
+
+  {% else %}
+    Zakończone zadania
+  {% endif %}
+  <br><br>
+</div>
+<hr>
+<div class="nazwa-projektu">
+  {{ nazwa_projektu }}<br>
+
+</div>
+<header>
+  {% if side == "done" %}
+    <p>Time need {{ suma_timeneed_done }} godzin</p>
+    <p>Time done {{ suma_done_done }} godzin</p>
+  {% else %}
+    <p>Time need {{ time_need }} godzin</p>
+    <p>Time done {{ time_done }} godzin</p>
+  {% endif %}
+Waga: {{ waga }}<br>
+Poziom: {{ poziom }}
+</header>
+<table id="customers">
+  <tr>
+    <th class="lp">Lp</th>
+    <th>Zadania</th>
+    <th>Branch</th>
+    <th>difficulty</th>
+    <th>weight</th>
+    <th>status</th>
+    <th>donetime</th>
+    <th>needtime</th>
+  </tr>
+  {% for zadanie in zadania %}
+  <tr class="lp">
+    <td class="lp">{{ forloop.counter }}</td>
+      {% if side == "delete" %}
+        <td><a href="{% url 'management:remove_task' zadanie.id %}">{{ zadanie.title }}</a></td>
+      {% else %}
+        <cos></cos>
+        <td><a href="{% url 'management:check_task' zadanie.id %}">{{ zadanie.title }}</a></td>
+      {% endif %}
+
+
+    <td>{{ zadanie.get_branch_display }}</td>
+
+
+    <td>{{ zadanie.get_level_display }}</td>
+    <td>{{ zadanie.get_weight_display }}</td>
+    <td>{{ zadanie.get_status_display }}</td>
+    <td>{{ zadanie.timedone }}</td>
+    <td>{{ zadanie.timeneed }}</td>
+  </tr>
+    {% empty %}
+    <h2>brak zadań do wyświetlenia</h2>
+  {% endfor %}
+</table>
+<div class="informacja">
+  {{ is_task }}
+
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}
+add task
+{% endblock %}
+{% block styles %}
+<link href="{% static 'management/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<div class="topnav">
+  <a href="{% url 'management:start' %}">lista projektów</a>
+  <a class="active" href="#contact">Dodawanie projektu</a>
+<!--  <a href="#about">About</a>-->
+</div>
+<br>
+<form class="formularz" method="POST" enctype="multipart/form-data">
+<h2>Podaj swoje dane</h2>
+  {% csrf_token %}
+  {{ form }}
+
+  <input type="submit" value="Wyślij">
+</form>
+
+{% endblock %}

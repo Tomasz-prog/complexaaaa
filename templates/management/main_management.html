@@ -1,0 +1,49 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}
+Management
+{% endblock %}
+{% block styles %}
+<link href="{% static 'management/style.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div id="nav-manage">
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <a style="font-size: 2rem" class="nav-link" href="/">Powrót</a>
+  </li>
+  <li class="nav-item">
+    <a style="font-size: 2rem" class="nav-link active" aria-current="page" href="{% url 'management:start' %}">Lista Projektów</a>
+  </li>
+  <li class="nav-item">
+    <a style="font-size: 2rem" class="nav-link" href="{% url 'management:add_projekt' %}">Dodaj Projekt</a>
+  </li>
+</ul>
+</div>
+
+Wybierz projekt
+  <br><br>
+</div>
+<table id="customers">
+  <tr>
+    <th class="lp">Lp</th>
+    <th>Project</th>
+<!--    <th>donetime</th>-->
+<!--    <th>needtime</th>-->
+  </tr>
+
+  {% for projekt in projects %}
+
+  <tr class="lp">
+    <td class="lp">{{ forloop.counter }}</td>
+    <td><a href="{%  url 'management:zadania' projekt.id %}">{{ projekt.project }}</a></td>
+
+  </tr>
+  {% endfor %}
+
+</table>
+
+
+{% endblock %}
