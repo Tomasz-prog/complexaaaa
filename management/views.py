@@ -3,31 +3,38 @@ from .models import Projects, Task
 from django.db.models import Sum
 from .forms import TaskForm, ProjektForm
 
-def podliczenie_czasow(suma_need):
+def podliczenie_czasow(suma_need, projekt_id):
 
     if suma_need['timeneed__sum'] != None:
 
-        suma_done_min = Task.objects.filter(projekt_id=no_project).exclude(status=2).aggregate(Sum('timedone'))
-        suma_done_done = Task.objects.filter(projekt_id=no_project, status=2).aggregate(Sum('timedone'))
+        suma_done_min = Task.objects.filter(projekt_id=projekt_id).exclude(status=2).aggregate(Sum('timedone'))
+        # suma_done_done = Task.objects.filter(projekt_id=projekt_id, status=2).aggregate(Sum('timedone'))
 
-        if suma_done_done["timedone__sum"] == None:
-            suma_done_done["timedone__sum"] = 0
+        if suma_done_min["timedone__sum"] == None:
+            suma_done_min["timedone__sum"] = 0
 
-        suma_done = round(float((suma_done_min["timedone__sum"] / 60)) + float((suma_done_done["timedone__sum"] / 60)),
-                          2)
+        suma_done = round(float((suma_done_min["timedone__sum"] / 60)), 2)
         suma_czas_do_skonczenia = round((suma_need["timeneed__sum"] - suma_done_min["timedone__sum"]) / 60, 2)
         info_o_zadaniach = ""
+
+        zadania_for_needtime = Task.objects.filter(status__lt=2, projekt_id=projekt_id)
+        suma_needtime = 0
+        for zadanie in zadania_for_needtime:
+            if zadanie.timedone >= zadanie.timeneed:
+                continue
+            else:
+                suma_needtime += (zadanie.timeneed - zadanie.timedone)
+
+        suma_czas_do_skonczenia = round((suma_needtime / 60),2)
     else:
         suma_czas_do_skonczenia = 0
         suma_done = 0
         info_o_zadaniach = "DODAJ ZADANIE"
 
     return suma_done, suma_czas_do_skonczenia, info_o_zadaniach
-
 def check_waga(projekt_id, weight, level):
 
     if weight == ['Minor']:
-        print('wybrano minor')
         zadania = Task.objects.all().filter(projekt=projekt_id, status__lt=2, weight=0)
         waga = "Minor"
     elif weight == ['Major']:
@@ -52,7 +59,6 @@ def check_waga(projekt_id, weight, level):
         waga = "Wszystkie"
 
     if level == ['Easy']:
-        print('wybrano easy')
         zadania = zadania.filter(level=0)
         poziom = "Easy"
     elif level == ['Medium']:
@@ -75,20 +81,16 @@ def check_waga(projekt_id, weight, level):
         poziom = "Wszystkie"
 
     return zadania, waga, poziom
-
 def start(request):
 
     projects = Projects.objects.all()
 
     return render(request, "main_management.html", {"projects": projects})
-
 def zadania(request, projekt_id: int):
-    global no_project
-    no_project = projekt_id
 
     poziom = "Wszystkie"
     waga = "Wszystkie"
-    projekt = Projects.objects.filter(id=no_project)
+    projekt = Projects.objects.filter(id=projekt_id)
     name_of_projekt = projekt[0].project
 
     zadania = Task.objects.all().filter(projekt=projekt_id, status__lt=2)
@@ -101,7 +103,7 @@ def zadania(request, projekt_id: int):
         lista = (check_waga(projekt_id, weight, level))
 
     suma_need = zadania.aggregate(Sum('timeneed'))
-    czasy = podliczenie_czasow(suma_need)
+    czasy = podliczenie_czasow(suma_need, projekt_id)
 
     contex = {"zadania": lista[0], "nr_projektu": projekt_id, "side": "show",
               "time_need": czasy[1], "time_done": czasy[0], "is_task": czasy[2],
@@ -109,60 +111,60 @@ def zadania(request, projekt_id: int):
 
     return render(request, "zadania.html", contex)
 
-    # ctx = {'projekt': projekt_id}
-    # return render(request, 'zadania.html', ctx)
+def add_task(request, projekt_id:int):
 
-def add_task(request):
 
-    global no_project
     form = TaskForm(request.POST or None)
     if form.is_valid():
         obj = form.save(commit=False)
-        obj.projekt_id = no_project
+        obj.projekt_id = projekt_id
         obj.save()
+        poziom = "Wszystkie"
+        waga = "Wszystkie"
+        projekt = Projects.objects.filter(id=projekt_id)
+        name_of_projekt = projekt[0].project
+        zadania = Task.objects.all().filter(projekt=projekt_id, status__lt=2)
+        suma_need = zadania.aggregate(Sum('timeneed'))
+        czasy = podliczenie_czasow(suma_need, projekt_id)
 
-        zadania = Task.objects.all().filter(projekt=no_project, status__lt=2)
-        contex = {"zadania": zadania, "nr_projektu": no_project, "side": "show"}
+        contex = {"zadania": zadania, "nr_projektu": projekt_id, "side": "show",
+                  "time_need": czasy[1], "time_done": czasy[0], "is_task": czasy[2],
+                  "nazwa_projektu": name_of_projekt, "waga": "wszystkie", "poziom": "wszystkie"}
         return render(request, "zadania.html", contex)
 
     return render(request, 'add_task.html', {'form': form,
-                                                  'numer_projektu':  no_project,
+                                                  'numer_projektu':  projekt_id,
                                                   'side': 'add'})
+def check_task(request, zadanie_id: int, nr_projektu: int):
 
-def check_task(request, zadanie_id: int):
-    # zadania = Task.objects.all().filter(id=zadanie_id)
-    # contex = {"zadania": zadania}
-    # return render(request, "main/check_task.html", contex)
-
-    global no_project
     task = Task.objects.get(id=zadanie_id)
-    no_project = task.projekt_id
+
     form = TaskForm(request.POST or None, instance=task)
 
     if form.is_valid():
         obj = form.save(commit=False)
-        obj.projekt_id = no_project
+        obj.projekt_id = nr_projektu
         obj.timedone = obj.timedone + obj.timeusing
         obj.timeusing = 0
         obj.save()
 
         poziom = "Wszystkie"
         waga = "Wszystkie"
-        projekt = Projects.objects.filter(id=no_project)
+        projekt = Projects.objects.filter(id=nr_projektu)
         name_of_projekt = projekt[0].project
 
-        zadania = Task.objects.all().filter(projekt=no_project, status__lt=2)
+        zadania = Task.objects.all().filter(projekt=nr_projektu, status__lt=2)
         lista = [zadania, waga, poziom]
         suma_need = zadania.aggregate(Sum('timeneed'))
-        czasy = podliczenie_czasow(suma_need)
+        czasy = podliczenie_czasow(suma_need,nr_projektu)
 
-        contex = {"zadania": lista[0], "nr_projektu": no_project, "side": "show",
+        contex = {"zadania": lista[0], "nr_projektu": nr_projektu, "side": "show",
                   "time_need": czasy[1], "time_done": czasy[0], "is_task": czasy[2],
                   "nazwa_projektu": name_of_projekt, "waga": lista[1], "poziom": lista[2]}
 
         return render(request, "zadania.html", contex)
 
-    return render(request, 'add_task.html', {'form': form, 'numer_projektu':  no_project})
+    return render(request, 'add_task.html', {'form': form, 'numer_projektu':  nr_projektu})
 def add_projekt(request):
 
     form = ProjektForm(request.POST or None)
@@ -172,55 +174,53 @@ def add_projekt(request):
         projects = Projects.objects.all()
         return render(request, "main_management.html", {'projects': projects})
     return render(request, 'add_projekt.html', {'form': form})
-
-
 def done_task(request, projekt_id: int):
-    global no_project
 
-    no_project = projekt_id
-    print(f"numer projektu : {no_project}")
     zadania = Task.objects.all().filter(projekt=projekt_id, status=2)
 
-    suma_need_done = Task.objects.filter(projekt_id=no_project, status=2).aggregate(Sum('timeneed'))
+    suma_need_done = Task.objects.filter(projekt_id=projekt_id, status=2).aggregate(Sum('timeneed'))
     if suma_need_done['timeneed__sum'] != None:
 
         suma_timeneed_done = round(suma_need_done["timeneed__sum"] / 60, 2)
-        suma_done_done = Task.objects.filter(projekt_id=no_project, status=2).aggregate(Sum('timedone'))
+        suma_done_done = Task.objects.filter(projekt_id=projekt_id, status=2).aggregate(Sum('timedone'))
         suma_done_done = round(suma_done_done["timedone__sum"] / 60, 2)
     else:
         suma_timeneed_done = 0
         suma_done_done = 0
 
-    contex = {"zadania": zadania, "nr_projektu": projekt_id, "side": "done", "suma_timeneed_done": suma_timeneed_done,
+    projekt = Projects.objects.filter(id=projekt_id)
+    name_of_projekt = projekt[0].project
+    poziom = "Wszystkie"
+    waga = "Wszystkie"
+    # contex = {"zadania": lista[0], "nr_projektu": projekt_id, "side": "show",
+    #           "time_need": czasy[1], "time_done": czasy[0], "is_task": czasy[2],
+    #           "nazwa_projektu": name_of_projekt, "waga": lista[1], "poziom": lista[2]}
+
+
+    contex = {"waga": waga, "poziom": poziom,"zadania": zadania, "nr_projektu": projekt_id, "side": "done", "nazwa_projektu": name_of_projekt, "suma_timeneed_done": suma_timeneed_done,
               "suma_done_done": suma_done_done}
 
     return render(request, "zadania.html", contex)
-
 def delete_task(request, projekt_id: int):
-    global no_project
 
-    no_project = projekt_id
-    print(f"numer projektu : {no_project}")
     zadania = Task.objects.all().filter(projekt=projekt_id)
     contex = {"zadania": zadania, "nr_projektu": projekt_id, "side": "delete"}
 
     return render(request, "zadania.html", contex)
+def remove_task(request, zadanie_id: int, nr_projektu:int):
 
-def remove_task(request, zadanie_id: int):
-    print(f"zadanie o numerze {zadanie_id} usunięto")
     projects = Projects.objects.all()
-    global no_project
 
-    print(f"numer projektu : {no_project}")
-    zadania = Task.objects.all().filter(projekt=no_project, status__lt=2)
-    projekt = Projects.objects.filter(id=no_project)
+
+    zadania = Task.objects.all().filter(projekt=nr_projektu, status__lt=2)
+    projekt = Projects.objects.filter(id=nr_projektu)
     name_of_projekt = projekt[0].project
-    suma_need = Task.objects.filter(projekt_id=no_project).exclude(status=2).aggregate(Sum('timeneed'))
+    suma_need = Task.objects.filter(projekt_id=nr_projektu).exclude(status=2).aggregate(Sum('timeneed'))
 
     if suma_need['timeneed__sum'] != None:
 
-        suma_done_min = Task.objects.filter(projekt_id=no_project).exclude(status=2).aggregate(Sum('timedone'))
-        suma_done_done = Task.objects.filter(projekt_id=no_project, status=2).aggregate(Sum('timedone'))
+        suma_done_min = Task.objects.filter(projekt_id=nr_projektu).exclude(status=2).aggregate(Sum('timedone'))
+        suma_done_done = Task.objects.filter(projekt_id=nr_projektu, status=2).aggregate(Sum('timedone'))
 
         if suma_done_done["timedone__sum"] == None:
             suma_done_done["timedone__sum"] = 0
@@ -237,7 +237,7 @@ def remove_task(request, zadanie_id: int):
     task_to_delete = Task.objects.filter(id=zadanie_id)
     task_to_delete.delete()
 
-    contex = {"zadania": zadania, "nr_projektu": no_project, "side": "show",
+    contex = {"zadania": zadania, "nr_projektu": nr_projektu, "side": "show",
               "nazwa_projektu": name_of_projekt,
               "time_need": suma_czas_do_skonczenia, "time_done": suma_done, "is_task": info_o_zadaniach}
 
@@ -246,7 +246,7 @@ def remove_task(request, zadanie_id: int):
     return render(request, "zadania.html", contex)
 
 
-# <td><a href="{%  url 'management:zadania' projekt.id %}">{{ projekt.project }}</a></td>
+
 
 
 

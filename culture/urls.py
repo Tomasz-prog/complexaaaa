@@ -3,5 +3,5 @@ from .views import main
 
 app_name = 'culture'
 urlpatterns = [
-    path('main', main, name="main")
+    path('main/', main, name="main")
 ]

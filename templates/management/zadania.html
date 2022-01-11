@@ -1,5 +1,6 @@
 {% extends 'base.html'%}
 {% load static %}
+{% load management_extras %}
 {% block title %}
 Management
 {% endblock %}
@@ -14,17 +15,17 @@ Management
 
   {% if side == "delete" %}
     <a   href="{% url 'management:zadania' nr_projektu %}">Zadania</a>
-    <a href="{% url 'management:add_task' %}">dodaj zadanie</a>
+    <a href="{% url 'management:add_task' nr_projektu%}">dodaj zadanie</a>
     <a class="active" href="{% url 'management:delete_task' nr_projektu %}">usun zadanie</a>
     <a href="{% url 'management:done_task' nr_projektu %}">done tasks</a>
   {% elif side == "show" %}
     <a  class="active" href="{% url 'management:zadania' nr_projektu %}">Zadania</a>
-    <a href="{% url 'management:add_task' %}">dodaj zadanie</a>
+    <a href="{% url 'management:add_task' nr_projektu %}">dodaj zadanie</a>
     <a href="{% url 'management:delete_task' nr_projektu %}">usun zadanie</a>
     <a href="{% url 'management:done_task' nr_projektu %}">done tasks</a>
   {% else %}
     <a href="{% url 'management:zadania' nr_projektu %}">Zadania</a>
-    <a href="{% url 'management:add_task' %}">dodaj zadanie</a>
+    <a href="{% url 'management:add_task' nr_projektu %}">dodaj zadanie</a>
     <a href="{% url 'management:delete_task' nr_projektu %}">usun zadanie</a>
     <a class="active"  href="{% url 'management:done_task' nr_projektu %}">done tasks</a>
   {% endif %}
@@ -111,10 +112,10 @@ Poziom: {{ poziom }}
   <tr class="lp">
     <td class="lp">{{ forloop.counter }}</td>
       {% if side == "delete" %}
-        <td><a href="{% url 'management:remove_task' zadanie.id %}">{{ zadanie.title }}</a></td>
+        <td><a href="{% url 'management:remove_task' zadanie.id nr_projektu %}">{{ zadanie.title }}</a></td>
       {% else %}
         <cos></cos>
-        <td><a href="{% url 'management:check_task' zadanie.id %}">{{ zadanie.title }}</a></td>
+        <td><a href="{% url 'management:check_task' zadanie.id nr_projektu %}">{{ zadanie.title }}</a></td>
       {% endif %}
 
 
@@ -127,6 +128,7 @@ Poziom: {{ poziom }}
     <td>{{ zadanie.timedone }}</td>
     <td>{{ zadanie.timeneed }}</td>
   </tr>
+
     {% empty %}
     <h2>brak zadań do wyświetlenia</h2>
   {% endfor %}

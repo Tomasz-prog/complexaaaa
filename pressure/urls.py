@@ -3,5 +3,5 @@ from .views import main
 
 app_name = 'pressure'
 urlpatterns = [
-    path('main', main, name="main")
+    path('main/', main, name="main")
 ]
