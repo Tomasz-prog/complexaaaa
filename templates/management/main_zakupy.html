@@ -1,0 +1,35 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}
+Index
+{% endblock %}
+{% block styles %}
+        <link href="{% static 'pressure/style.css' %}" rel="stylesheet">
+
+
+
+
+{% endblock %}
+{% block content %}
+<nav class="navbar navbar-light bg-light">
+  <form class="container-fluid justify-content-start">
+    <a href="/"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">Powrót</button></a>
+  </form>
+</nav>
+
+    <h1>Podaj Produkty</h1>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.product1.label }}<br>{{ form.product1}}<br><br>
+  {{ form.product2.label }}<br>{{ form.product2}}<br><br>
+  {{ form.product3.label }}<br>{{ form.product3}}<br><br>
+  {{ form.product4.label }}<br>{{ form.product4}}<br><br>
+  {{ form.product5.label }}<br>{{ form.product5}}<br><br>
+
+  <input type="submit" value="wyslij">
+</form>
+
+
+{% endblock %}

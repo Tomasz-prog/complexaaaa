@@ -8,5 +8,6 @@ urlpatterns = [
     path('pressure/',include('pressure.urls')),
     path('culture/',include('culture.urls')),
     path('management/',include('management.urls')),
+    path('kitchen/',include('kitchen.urls')),
     path('', glowna)
 ]

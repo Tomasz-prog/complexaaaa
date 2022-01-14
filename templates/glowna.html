@@ -1,8 +1,10 @@
 {% extends 'base.html'%}
 {% load static %}
 
-{% block title %}
-Index
+{% block title %}Index{% endblock %}
+
+
+
 {% block styles %}
 
 <link href="{% static 'management/main.css' %}" rel="stylesheet">
@@ -11,7 +13,6 @@ Index
 {% endblock %}
 
 
-{% endblock %}
 
 {% block content %}
 <nav class="navbar navbar-light bg-light">
@@ -21,6 +22,7 @@ Index
     <a href="{% url 'culture:main' %}"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;Culture Club&nbsp;&nbsp</button></a>
     <a href="#"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;Bills&nbsp;&nbsp</button></a>
     <a href="#"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;book learning continue&nbsp;&nbsp</button></a>
+    <a href="{% url 'kitchen:formularz' %}"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;shopping list&nbsp;&nbsp</button></a>
 
   </form>
 </nav>
