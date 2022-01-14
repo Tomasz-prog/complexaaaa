@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'pressure',
     'culture',
     'management',
+    'kitchen',
 ]
 
 MIDDLEWARE = [

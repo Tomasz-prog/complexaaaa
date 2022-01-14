@@ -1,0 +1,44 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block title %}
+Index
+{% endblock %}
+{% block styles %}
+        <link href="{% static 'pressure/style.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="https://www.w3schools.com/html/styles.css">
+
+
+
+{% endblock %}
+{% block content %}
+
+Pressure <br>
+
+{% endblock %}
+<h2>
+    {% for message in messages %}
+{{ message }}
+
+{% endfor %}
+</h2>
+    <h1>Podaj Produkty</h1>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.product1.label }}<br>{{ form.product1}}<br><br>
+  {{ form.product2.label }}<br>{{ form.product2}}<br><br>
+  {{ form.product3.label }}<br>{{ form.product3}}<br><br>
+<!--  {{ form.product4.label }}<br>{{ form.product4}}<br><br>-->
+<!--  {{ form.product5.label }}<br>{{ form.product5}}<br><br>-->
+<!--  {{ form.product6.label }}<br>{{ form.product6}}<br><br>-->
+<!--  {{ form.product7.label }}<br>{{ form.product7}}<br><br>-->
+<!--  {{ form.product8.label }}<br>{{ form.product8}}<br><br>-->
+<!--  {{ form.product9.label }}<br>{{ form.product9}}<br><br>-->
+<!--  {{ form.product10.label }}<br>{{ form.product10}}<br><br>-->
+
+  <input type="submit" value="wyslij">
+</form>
+
+</body>
+</html>
