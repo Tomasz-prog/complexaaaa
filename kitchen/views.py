@@ -72,7 +72,7 @@ def formularz(request):
                 )
             messages.success(request, f"Wiadmość została wysłana do {klient}.")
             return render(request, "glowna.html")
-
+            #
 
     else:
         form = ShoppingItems()

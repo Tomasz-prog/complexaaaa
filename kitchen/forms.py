@@ -1,6 +1,7 @@
 from django import forms
 
 class ShoppingItems(forms.Form):
+
     product1 = forms.CharField(label='Produkt nr.1', max_length=100, required=False)
     product2 = forms.CharField(label='Produkt nr.2', max_length=100, required=False)
     product3 = forms.CharField(label='Produkt nr.3', max_length=100,required=False)

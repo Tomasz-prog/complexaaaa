@@ -23,8 +23,13 @@
     <a href="#"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;Bills&nbsp;&nbsp</button></a>
     <a href="#"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;book learning continue&nbsp;&nbsp</button></a>
     <a href="{% url 'kitchen:formularz' %}"><button style="font-size: 2rem; color: black" class="btn btn-outline-success me-2" type="button">&nbsp;&nbsp;shopping list&nbsp;&nbsp</button></a>
-
   </form>
 </nav>
+<h2 class="info">
+  {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+</h2>
+
 
 {% endblock %}
